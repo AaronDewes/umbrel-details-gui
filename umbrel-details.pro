@@ -1,4 +1,4 @@
-QT += gui waylandcompositor svg
+QT += gui svg network
 INCLUDEPATH += qrcode/
 
 HEADERS += \
