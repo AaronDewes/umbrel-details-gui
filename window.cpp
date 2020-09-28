@@ -92,7 +92,7 @@ void Window::drawBackground()
     QFile file("/home/umbrel/umbrel/tor/data/web/hostname");
     file.open(QIODevice::ReadOnly);
     QTextStream s(&file);
-    QString torAddress = s.readAll();
+    QString torAddress = "http://" + s.readAll();
 
     // Get IP
     QString ipAddress;
@@ -132,9 +132,9 @@ void Window::drawBackground()
     painter3.translate(0, 40);
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "http://umbrel.local");
     painter3.translate(0, 40);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter,  "http://" + ipAddress);
+    painter3.drawText(this->geometry(), Qt::AlignHCenter, "http://" + ipAddress);
     painter3.translate(0, 40);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter,  "http://" + torAddress);
+    painter3.drawText(this->geometry(), Qt::AlignHCenter, torAddress);
     painter3.end();
 }
 
