@@ -60,7 +60,6 @@
 #include <QHostAddress>
 #include <QNetworkInterface>
 
-#include "compositor.h"
 #include <QtWaylandCompositor/qwaylandseat.h>
 
 #include "QrCode.hpp"
@@ -71,19 +70,9 @@ Window::Window()
 {
 }
 
-void Window::setCompositor(Compositor *comp) {
-    m_compositor = comp;
-    connect(m_compositor, &Compositor::startMove, this, &Window::startMove);
-    connect(m_compositor, &Compositor::startResize, this, &Window::startResize);
-    connect(m_compositor, &Compositor::dragStarted, this, &Window::startDrag);
-}
-
 void Window::init()
 {
-    m_compositor->create();
-    m_compositor->startRender();
     drawBackground();
-    m_compositor->endRender();
 }
 
 void Window::drawBackground()
@@ -137,148 +126,6 @@ void Window::drawBackground()
     painter3.drawText(this->geometry(), Qt::AlignHCenter, torAddress);
     painter3.end();
 }
-
-QPointF Window::getAnchorPosition(const QPointF &position, int resizeEdge, const QSize &windowSize)
-{
-    float y = position.y();
-    if (resizeEdge & QWaylandXdgSurfaceV5::ResizeEdge::TopEdge)
-        y += windowSize.height();
-
-    float x = position.x();
-    if (resizeEdge & QWaylandXdgSurfaceV5::ResizeEdge::LeftEdge)
-        x += windowSize.width();
-
-    return QPointF(x, y);
-}
-
-QPointF Window::getAnchoredPosition(const QPointF &anchorPosition, int resizeEdge, const QSize &windowSize)
-{
-    return anchorPosition - getAnchorPosition(QPointF(), resizeEdge, windowSize);
-}
-
-View *Window::viewAt(const QPointF &point)
-{
-    View *ret = nullptr;
-    const auto views = m_compositor->views();
-    for (View *view : views) {
-        if (view == m_dragIconView)
-            continue;
-        QRectF geom(view->position(), view->size());
-        if (geom.contains(point))
-            ret = view;
-    }
-    return ret;
-}
-
-void Window::startMove()
-{
-    m_grabState = MoveGrab;
-}
-
-void Window::startResize(int edge, bool anchored)
-{
-    m_initialSize = m_mouseView->windowSize();
-    m_grabState = ResizeGrab;
-    m_resizeEdge = edge;
-    m_resizeAnchored = anchored;
-    m_resizeAnchorPosition = getAnchorPosition(m_mouseView->position(), edge, m_mouseView->surface()->destinationSize());
-}
-
-void Window::startDrag(View *dragIcon)
-{
-    m_grabState = DragGrab;
-    m_dragIconView = dragIcon;
-    m_compositor->raise(dragIcon);
-}
-
-void Window::mousePressEvent(QMouseEvent *e)
-{
-    if (mouseGrab())
-        return;
-    if (m_mouseView.isNull()) {
-        m_mouseView = viewAt(e->localPos());
-        if (!m_mouseView) {
-            m_compositor->closePopups();
-            return;
-        }
-        if (e->modifiers() == Qt::AltModifier || e->modifiers() == Qt::MetaModifier)
-            m_grabState = MoveGrab; //start move
-        else
-            m_compositor->raise(m_mouseView);
-        m_initialMousePos = e->localPos();
-        m_mouseOffset = e->localPos() - m_mouseView->position();
-
-        QMouseEvent moveEvent(QEvent::MouseMove, e->localPos(), e->globalPos(), Qt::NoButton, Qt::NoButton, e->modifiers());
-        sendMouseEvent(&moveEvent, m_mouseView);
-    }
-    sendMouseEvent(e, m_mouseView);
-}
-
-void Window::mouseReleaseEvent(QMouseEvent *e)
-{
-    if (!mouseGrab())
-        sendMouseEvent(e, m_mouseView);
-    if (e->buttons() == Qt::NoButton) {
-        if (m_grabState == DragGrab) {
-            View *view = viewAt(e->localPos());
-            m_compositor->handleDrag(view, e);
-        }
-        m_mouseView = nullptr;
-        m_grabState = NoGrab;
-    }
-}
-
-void Window::mouseMoveEvent(QMouseEvent *e)
-{
-    switch (m_grabState) {
-    case NoGrab: {
-        View *view = m_mouseView ? m_mouseView.data() : viewAt(e->localPos());
-        sendMouseEvent(e, view);
-        if (!view)
-            setCursor(Qt::ArrowCursor);
-    }
-        break;
-    case MoveGrab: {
-        m_mouseView->setPosition(e->localPos() - m_mouseOffset);
-        update();
-    }
-        break;
-    case ResizeGrab: {
-        QPoint delta = (e->localPos() - m_initialMousePos).toPoint();
-        m_compositor->handleResize(m_mouseView, m_initialSize, delta, m_resizeEdge);
-    }
-        break;
-    case DragGrab: {
-        View *view = viewAt(e->localPos());
-        m_compositor->handleDrag(view, e);
-        if (m_dragIconView) {
-            m_dragIconView->setPosition(e->localPos() + m_dragIconView->offset());
-            update();
-        }
-    }
-        break;
-    }
-}
-
-void Window::sendMouseEvent(QMouseEvent *e, View *target)
-{
-    QPointF mappedPos = e->localPos();
-    if (target)
-        mappedPos -= target->position();
-    QMouseEvent viewEvent(e->type(), mappedPos, e->localPos(), e->button(), e->buttons(), e->modifiers());
-    m_compositor->handleMouseEvent(target, &viewEvent);
-}
-
-void Window::keyPressEvent(QKeyEvent *e)
-{
-    m_compositor->defaultSeat()->sendKeyPressEvent(e->nativeScanCode());
-}
-
-void Window::keyReleaseEvent(QKeyEvent *e)
-{
-    m_compositor->defaultSeat()->sendKeyReleaseEvent(e->nativeScanCode());
-}
-
 void Window::update()
 {
     if (!isExposed())

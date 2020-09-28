@@ -56,7 +56,6 @@
 
 QT_BEGIN_NAMESPACE
 
-class Compositor;
 class View;
 class QSvgRenderer;
 
@@ -65,7 +64,6 @@ class Window : public QWindow
 public:
     Window();
 
-    void setCompositor(Compositor *comp);
     void init();
     QSvgRenderer *getQrCode(QString *address);
     
@@ -78,29 +76,13 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void exposeEvent(QExposeEvent *event) override;
 
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
-
-    void keyPressEvent(QKeyEvent *e) override;
-    void keyReleaseEvent(QKeyEvent *e) override;
-
-private slots:
-    void startMove();
-    void startResize(int edge, bool anchored);
-    void startDrag(View *dragIcon);
 
 private:
     enum GrabState { NoGrab, MoveGrab, ResizeGrab, DragGrab };
 
-    View *viewAt(const QPointF &point);
     bool mouseGrab() const { return m_grabState != NoGrab ;}
     void drawBackground();
-    void sendMouseEvent(QMouseEvent *e, View *target);
-    static QPointF getAnchoredPosition(const QPointF &anchorPosition, int resizeEdge, const QSize &windowSize);
-    static QPointF getAnchorPosition(const QPointF &position, int resizeEdge, const QSize &windowSize);
 
-    Compositor *m_compositor = nullptr;
     QPointer<View> m_mouseView;
     GrabState m_grabState = NoGrab;
     QSize m_initialSize;
