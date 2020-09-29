@@ -1,5 +1,7 @@
 # umbrel-details-gui
 
+![Example](example.png)
+
 A gui version of umbrel-details. Only works on Raspberry Pis.
 
 ## Required packages to run this:
