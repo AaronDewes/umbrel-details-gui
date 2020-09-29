@@ -1,0 +1,5 @@
+<RCC>
+    <qresource>
+        <file alias="umbrel.svg">umbrel.svg</file>
+    </qresource>
+</RCC>

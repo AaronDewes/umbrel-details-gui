@@ -8,5 +8,7 @@ SOURCES += main.cpp \
     window.cpp \
     qrcode/QrCode.cpp
 
+RESOURCES += umbrel-details.qrc
+
 TARGET = umbrel-details
 INSTALLS += target

@@ -77,6 +77,12 @@ void Window::init()
 
 void Window::drawBackground()
 {
+    // Get logo
+    QFile file2(":/umbrel.svg");
+    file2.open(QIODevice::ReadOnly);
+    QTextStream s2(&file2);
+    QString logoString = s2.readAll();
+
     // Get tor host name
     QFile file("/home/umbrel/umbrel/tor/data/web/hostname");
     file.open(QIODevice::ReadOnly);
@@ -115,7 +121,7 @@ void Window::drawBackground()
     painter3.setPen(QPen(Qt::white));
     painter3.setFont(QFont("Roboto", 50, QFont::Bold));
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "Welcome!");
-    painter3.translate(0, 80);
+    painter3.translate(0, 90);
     painter3.setFont(QFont("Roboto", 20, QFont::Bold));
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "Your Umbrel is up and running at:");
     painter3.translate(0, 40);
@@ -124,7 +130,24 @@ void Window::drawBackground()
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "http://" + ipAddress);
     painter3.translate(0, 40);
     painter3.drawText(this->geometry(), Qt::AlignHCenter, torAddress);
+    painter3.translate(0, 600);
+    painter3.drawText(this->geometry(), Qt::AlignHCenter, "Thank you for using Umbrel!");
     painter3.end();
+
+    // Draw Umbrel logo in the bottom left corner
+    QImage logoImage(68, 76.5, QImage::Format_ARGB32);
+    logoImage.fill(QColor(83, 81, 251));
+    QPainter painter4(&logoImage);
+    QXmlStreamReader *reader = new QXmlStreamReader(logoString);
+    QSvgRenderer *renderer2 = new QSvgRenderer(reader);
+    renderer2->render(&painter4);
+    QPaintDevice *device2 = m_backingStore->paintDevice();
+    QPainter painter5(device2);
+    int delta2X = this->geometry().width() - logoImage.width() - 15;
+    int delta2Y = this->geometry().height() - logoImage.height() - 15;
+    painter5.translate(delta2X, delta2Y);
+    painter5.drawImage(logoImage.rect(), logoImage);
+    painter5.end();
 }
 void Window::update()
 {
