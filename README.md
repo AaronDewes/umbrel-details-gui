@@ -25,3 +25,7 @@ To run this on an Raspberry Pi with Umbrel OS, run
 ```
 ./umbrel-details -platform linuxfb
 ```
+
+## License
+
+The umbrel logo is Copyright 2020 Umbrel and is licensed under the terms and conditions of the MIT License.
