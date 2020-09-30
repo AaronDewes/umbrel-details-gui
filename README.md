@@ -15,7 +15,7 @@ sudo apt install libqt5gui5 libqt5svg5 libqt5network5 -y
 ```
 mkdir build
 cd build
-qmake ..
+cmake ..
 make -j$(nproc)
 ```
 
@@ -23,7 +23,8 @@ make -j$(nproc)
 
 To run this on an Raspberry Pi with Umbrel OS, run
 ```
-./umbrel-details -platform linuxfb
+export QT_QPA_LINUXFB_HIDECURSOR=1
+./umbrel-details -platform eglfs
 ```
 
 ## License

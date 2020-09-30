@@ -50,17 +50,16 @@
 
 #include "window.h"
 
-#include <QMouseEvent>
+#include <QFile>
+#include <QExposeEvent>
+#include <QResizeEvent>
 #include <QWindow>
 #include <QBackingStore>
-#include <QMatrix4x4>
 #include <QPainter>
 #include <QXmlStreamReader>
 #include <QSvgRenderer>
 #include <QHostAddress>
 #include <QNetworkInterface>
-
-#include <QtWaylandCompositor/qwaylandseat.h>
 
 #include "QrCode.hpp"
 
@@ -82,6 +81,10 @@ void Window::drawBackground()
     file2.open(QIODevice::ReadOnly);
     QTextStream s2(&file2);
     QString logoString = s2.readAll();
+    QFile file3(":/umbrel2.svg");
+    file3.open(QIODevice::ReadOnly);
+    QTextStream s3(&file3);
+    QString logoString2 = s3.readAll();
 
     // Get tor host name
     QFile file("/home/umbrel/umbrel/tor/data/web/hostname");
@@ -110,9 +113,19 @@ void Window::drawBackground()
     QPainter painter2(device);
     int deltaX = this->geometry().width() - backgroundImage.width();
     int deltaY = this->geometry().height() - backgroundImage.height() + 260;
+    int deltaX2 = backgroundImage.width() - 136;
+    int deltaY2 = backgroundImage.height() - 153;
     painter2.drawImage(this->geometry(), backgroundColorImage);
     painter2.translate(deltaX / 2, deltaY / 2);
     painter2.drawImage(backgroundImage.rect(), backgroundImage);
+    QImage logoImage2(136, 153, QImage::Format_ARGB32);
+    logoImage2.fill(Qt::white);
+    QPainter painter6(&logoImage2);
+    QXmlStreamReader *reader2 = new QXmlStreamReader(logoString2);
+    QSvgRenderer *renderer3 = new QSvgRenderer(reader2);
+    renderer3->render(&painter6);
+    painter2.translate(deltaX2 / 2, deltaY2 / 2);
+    painter2.drawImage(logoImage2.rect(), logoImage2);
     painter2.end();
 
     // Add text
@@ -141,17 +154,20 @@ void Window::drawBackground()
     QXmlStreamReader *reader = new QXmlStreamReader(logoString);
     QSvgRenderer *renderer2 = new QSvgRenderer(reader);
     renderer2->render(&painter4);
-    QPaintDevice *device2 = m_backingStore->paintDevice();
-    QPainter painter5(device2);
-    int delta2X = this->geometry().width() - logoImage.width() - 15;
-    int delta2Y = this->geometry().height() - logoImage.height() - 15;
-    painter5.translate(delta2X, delta2Y);
+    QPainter painter5(device);
+    int deltaX3 = this->geometry().width() - logoImage.width() - 15;
+    int deltaY3 = this->geometry().height() - logoImage.height() - 15;
+    painter5.translate(deltaX3, deltaY3);
     painter5.drawImage(logoImage.rect(), logoImage);
     painter5.end();
 }
+
 void Window::update()
 {
     if (!isExposed())
+        return;
+    // Remove this for screenshots using linuxfb, but having it otherwise results in glitches
+    if(updated)
         return;
 
     QRect rect(0, 0, width(), height());
@@ -160,6 +176,7 @@ void Window::update()
     drawBackground();
     m_backingStore->endPaint();
     m_backingStore->flush(rect);
+    updated = true;
 }
 
 bool Window::event(QEvent *event)
@@ -183,7 +200,7 @@ void Window::resizeEvent(QResizeEvent *resizeEvent)
 }
 
 QSvgRenderer *Window::getQrCode(QString *address) {
-    qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText(address->toStdString().c_str(), qrcodegen::QrCode::Ecc::MEDIUM);
+    qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText(address->toStdString().c_str(), qrcodegen::QrCode::Ecc::HIGH);
     QString svg = QString::fromStdString(qr0.toSvgString(4));
     QXmlStreamReader *reader = new QXmlStreamReader(svg);
     QSvgRenderer *renderer = new QSvgRenderer(reader);

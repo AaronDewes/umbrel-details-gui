@@ -48,8 +48,8 @@
 **
 ****************************************************************************/
 
-#ifndef COMPOSITORWINDOW_H
-#define COMPOSITORWINDOW_H
+#ifndef WINDOW_H
+#define WINDOW_H
 
 #include <QWindow>
 #include <QPointer>
@@ -93,8 +93,9 @@ private:
     QPointF m_initialMousePos;
     View *m_dragIconView = nullptr;
     QBackingStore *m_backingStore = nullptr;
+    bool updated = false;
 };
 
 QT_END_NAMESPACE
 
-#endif // COMPOSITORWINDOW_H
+#endif // WINDOW_H
