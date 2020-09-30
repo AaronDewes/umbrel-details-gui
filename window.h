@@ -93,7 +93,6 @@ private:
     QPointF m_initialMousePos;
     View *m_dragIconView = nullptr;
     QBackingStore *m_backingStore = nullptr;
-    bool updated = false;
 };
 
 QT_END_NAMESPACE

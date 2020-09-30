@@ -1,4 +1,4 @@
-# umbrel-details-gui
+# GUI for Umbrel details
 
 ![Example](example.png)
 
@@ -23,7 +23,7 @@ make -j$(nproc)
 
 To run this on an Raspberry Pi with Umbrel OS, run
 ```
-export QT_QPA_LINUXFB_HIDECURSOR=1
+export QT_QPA_EGLFS_HIDECURSOR=1
 ./umbrel-details -platform eglfs
 ```
 

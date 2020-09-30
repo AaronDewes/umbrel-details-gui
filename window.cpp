@@ -77,20 +77,20 @@ void Window::init()
 void Window::drawBackground()
 {
     // Get logo
-    QFile file2(":/umbrel.svg");
-    file2.open(QIODevice::ReadOnly);
-    QTextStream s2(&file2);
-    QString logoString = s2.readAll();
-    QFile file3(":/umbrel2.svg");
-    file3.open(QIODevice::ReadOnly);
-    QTextStream s3(&file3);
-    QString logoString2 = s3.readAll();
+    QFile file(":/umbrel.svg");
+    QFile file1(":/umbrel2.svg");
+    file.open(QIODevice::ReadOnly);
+    file1.open(QIODevice::ReadOnly);
+    QTextStream s(&file);
+    QTextStream s1(&file1);
+    QString logoString = s.readAll();
+    QString logoString1 = s1.readAll();
 
     // Get tor host name
-    QFile file("/home/umbrel/umbrel/tor/data/web/hostname");
-    file.open(QIODevice::ReadOnly);
-    QTextStream s(&file);
-    QString torAddress = "http://" + s.readAll();
+    QFile file2("/home/umbrel/umbrel/tor/data/web/hostname");
+    file2.open(QIODevice::ReadOnly);
+    QTextStream s2(&file2);
+    QString torAddress = "http://" + s2.readAll();
 
     // Get IP
     QString ipAddress;
@@ -101,38 +101,40 @@ void Window::drawBackground()
         }
     }
 
-    // Draw background with QR code
+    // Prepare images
+    QPaintDevice *device = m_backingStore->paintDevice();
     QImage backgroundColorImage = QImage(this->geometry().size(), QImage::Format_RGB32);
-    backgroundColorImage.fill(QColor(83, 81, 251));
     QImage backgroundImage(500, 500, QImage::Format_ARGB32);
+    QImage logoImage(136, 153, QImage::Format_ARGB32);
+    QImage logoImage1(68, 76.5, QImage::Format_ARGB32);
+    backgroundColorImage.fill(QColor(83, 81, 251));
     backgroundImage.fill(Qt::white);
+    logoImage.fill(Qt::white);
+    logoImage1.fill(QColor(83, 81, 251));
     QPainter painter(&backgroundImage);
+    QPainter painter2(&logoImage);
     QSvgRenderer *renderer = getQrCode(&torAddress);
     renderer->render(&painter);
-    QPaintDevice *device = m_backingStore->paintDevice();
-    QPainter painter2(device);
     int deltaX = this->geometry().width() - backgroundImage.width();
     int deltaY = this->geometry().height() - backgroundImage.height() + 260;
     int deltaX2 = backgroundImage.width() - 136;
     int deltaY2 = backgroundImage.height() - 153;
-    painter2.drawImage(this->geometry(), backgroundColorImage);
-    painter2.translate(deltaX / 2, deltaY / 2);
-    painter2.drawImage(backgroundImage.rect(), backgroundImage);
-    QImage logoImage2(136, 153, QImage::Format_ARGB32);
-    logoImage2.fill(Qt::white);
-    QPainter painter6(&logoImage2);
-    QXmlStreamReader *reader2 = new QXmlStreamReader(logoString2);
-    QSvgRenderer *renderer3 = new QSvgRenderer(reader2);
-    renderer3->render(&painter6);
-    painter2.translate(deltaX2 / 2, deltaY2 / 2);
-    painter2.drawImage(logoImage2.rect(), logoImage2);
-    painter2.end();
+    QXmlStreamReader *reader = new QXmlStreamReader(logoString1);
+    QSvgRenderer *renderer1 = new QSvgRenderer(reader);
+    renderer1->render(&painter2);
 
-    // Add text
+    // Draw background with QR code
     QPainter painter3(device);
-    painter3.translate(0, 20 + deltaY / 2 - 300);
+    painter3.drawImage(this->geometry(), backgroundColorImage);
+    painter3.translate(deltaX / 2, deltaY / 2);
+    painter3.drawImage(backgroundImage.rect(), backgroundImage);
+    painter3.translate(deltaX2 / 2, deltaY2 / 2);
+    painter3.drawImage(logoImage.rect(), logoImage);
+    painter3.translate(-(deltaX / 2), -(deltaY / 2));
+    painter3.translate(-(deltaX2 / 2), -(deltaY2 / 2));
     painter3.setPen(QPen(Qt::white));
     painter3.setFont(QFont("Roboto", 50, QFont::Bold));
+    painter3.translate(0, 20 + deltaY / 2 - 300);
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "Welcome!");
     painter3.translate(0, 90);
     painter3.setFont(QFont("Roboto", 20, QFont::Bold));
@@ -145,29 +147,22 @@ void Window::drawBackground()
     painter3.drawText(this->geometry(), Qt::AlignHCenter, torAddress);
     painter3.translate(0, 600);
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "Thank you for using Umbrel!");
-    painter3.end();
 
     // Draw Umbrel logo in the bottom left corner
-    QImage logoImage(68, 76.5, QImage::Format_ARGB32);
-    logoImage.fill(QColor(83, 81, 251));
-    QPainter painter4(&logoImage);
-    QXmlStreamReader *reader = new QXmlStreamReader(logoString);
-    QSvgRenderer *renderer2 = new QSvgRenderer(reader);
+    QPainter painter4(&logoImage1);
+    QXmlStreamReader *reader1 = new QXmlStreamReader(logoString);
+    QSvgRenderer *renderer2 = new QSvgRenderer(reader1);
     renderer2->render(&painter4);
-    QPainter painter5(device);
-    int deltaX3 = this->geometry().width() - logoImage.width() - 15;
-    int deltaY3 = this->geometry().height() - logoImage.height() - 15;
-    painter5.translate(deltaX3, deltaY3);
-    painter5.drawImage(logoImage.rect(), logoImage);
-    painter5.end();
+    int deltaX3 = this->geometry().width() - logoImage1.width() - 15;
+    int deltaY3 = this->geometry().height() - logoImage1.height() - 15;
+    painter3.translate(deltaX3, -(20 + deltaY / 2 - 300) - 600 - 40 * 3 - 90 + deltaY3);
+    painter3.drawImage(logoImage1.rect(), logoImage1);
+    painter3.end();
 }
 
 void Window::update()
 {
     if (!isExposed())
-        return;
-    // Remove this for screenshots using linuxfb, but having it otherwise results in glitches
-    if(updated)
         return;
 
     QRect rect(0, 0, width(), height());
@@ -176,7 +171,6 @@ void Window::update()
     drawBackground();
     m_backingStore->endPaint();
     m_backingStore->flush(rect);
-    updated = true;
 }
 
 bool Window::event(QEvent *event)
