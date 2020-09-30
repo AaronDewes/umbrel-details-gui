@@ -78,20 +78,7 @@ protected:
 
 
 private:
-    enum GrabState { NoGrab, MoveGrab, ResizeGrab, DragGrab };
-
-    bool mouseGrab() const { return m_grabState != NoGrab ;}
     void drawBackground();
-
-    QPointer<View> m_mouseView;
-    GrabState m_grabState = NoGrab;
-    QSize m_initialSize;
-    int m_resizeEdge;
-    bool m_resizeAnchored;
-    QPointF m_resizeAnchorPosition;
-    QPointF m_mouseOffset;
-    QPointF m_initialMousePos;
-    View *m_dragIconView = nullptr;
     QBackingStore *m_backingStore = nullptr;
 };
 
