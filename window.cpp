@@ -48,6 +48,7 @@
 **
 ****************************************************************************/
 
+#include "config.h"
 #include "window.h"
 
 #include <QFile>
@@ -107,10 +108,10 @@ void Window::drawBackground()
     QImage backgroundImage(500, 500, QImage::Format_ARGB32);
     QImage logoImage(136, 153, QImage::Format_ARGB32);
     QImage logoImage1(68, 76.5, QImage::Format_ARGB32);
-    backgroundColorImage.fill(QColor(83, 81, 251));
+    backgroundColorImage.fill(QColor(BACKGKROUND_COLOR));
     backgroundImage.fill(Qt::white);
     logoImage.fill(Qt::white);
-    logoImage1.fill(QColor(83, 81, 251));
+    logoImage1.fill(QColor(BACKGKROUND_COLOR));
     QPainter painter(&backgroundImage);
     QPainter painter2(&logoImage);
     QSvgRenderer *renderer = getQrCode(&torAddress);
@@ -132,12 +133,12 @@ void Window::drawBackground()
     painter3.drawImage(logoImage.rect(), logoImage);
     painter3.translate(-(deltaX / 2), -(deltaY / 2));
     painter3.translate(-(deltaX2 / 2), -(deltaY2 / 2));
-    painter3.setPen(QPen(Qt::white));
-    painter3.setFont(QFont("Roboto", 50, QFont::Bold));
+    painter3.setPen(QPen(QColor(TEXT_COLOR)));
+    painter3.setFont(QFont(DEFAULT_FONT, 50, QFont::Bold));
     painter3.translate(0, 20 + deltaY / 2 - 300);
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "Welcome!");
     painter3.translate(0, 90);
-    painter3.setFont(QFont("Roboto", 20, QFont::Bold));
+    painter3.setFont(QFont(DEFAULT_FONT, 20, QFont::Bold));
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "Your Umbrel is up and running at:");
     painter3.translate(0, 40);
     painter3.drawText(this->geometry(), Qt::AlignHCenter, "http://umbrel.local");
