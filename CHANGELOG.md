@@ -2,6 +2,11 @@
 
 ## Beta versions
 
+### v0.2.1
+
+- Fix: Show a message if the system is not supported.
+- Add automated builds using GitHub actions.
+
 ### v0.2.0
 
 - Add Umbrel logo to the QR code
