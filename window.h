@@ -52,7 +52,6 @@
 #define WINDOW_H
 
 #include <QWindow>
-#include <QPointer>
 
 QT_BEGIN_NAMESPACE
 

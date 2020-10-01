@@ -2,6 +2,11 @@
 
 ## Beta versions
 
+### v0.2.2
+
+- Fix "Attribute Qt::AA_ShareOpenGLContexts must be set before QCoreApplication is created." warning
+- Drop linuxfb support. Not working with the latest version.
+
 ### v0.2.1
 
 - Fix: Show a message if the system is not supported.
