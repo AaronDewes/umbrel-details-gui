@@ -54,9 +54,12 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-
+    if(app.platformName() != "linuxfb" && app.platformName() != "eglfs") {
+        qInfo("This application currently only works on eglfs or linuxfb.");
+        qInfo("Try running it with '-platform eglfs' or '-platform linuxfb'.");
+        return 1;
+    }
     Window window;
-    window.resize(800,600);
     window.show();
     window.init();
 
