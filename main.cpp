@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication app(argc, argv);
     if(app.platformName() != "eglfs") {
-        qInfo("This application currently only works on eglfs");
+        qInfo("This application currently only works on eglfs.");
         qInfo("Try running it with '-platform eglfs'.");
         return 1;
     }

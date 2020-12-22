@@ -2,6 +2,11 @@
 
 ## Beta versions
 
+### v0.3.0
+
+- Update icon in the center of the QR code
+- Code cleanups
+
 ### v0.2.2
 
 - Fix "Attribute Qt::AA_ShareOpenGLContexts must be set before QCoreApplication is created." warning
@@ -29,7 +34,7 @@
 
 - Fix missing "http://" in QR Code link
 - Optimize text align
-- Remove unsused wayland compositor
+- Remove unused wayland compositor
 - Code cleanups
 
 ### v0.0.1

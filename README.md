@@ -2,7 +2,7 @@
 
 ![Example](example.png)
 
-A gui version of umbrel-details. Only works on Raspberry Pis.
+A gui version of umbrel-details. Only works on Raspberry Pis with Umbrel OS installed.
 
 ## Required packages to run this:
 

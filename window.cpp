@@ -3,11 +3,11 @@
 ** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the examples of the Qt Wayland module
+** This logoFile is part of the examples of the Qt Wayland module
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
+** Licensees holding valid commercial Qt licenses may use this logoFile in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
@@ -15,7 +15,7 @@
 ** information use the contact form at https://www.qt.io/contact-us.
 **
 ** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
+** Alternatively, you may use this logoFile under the terms of the BSD license
 ** as follows:
 **
 ** "Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,10 @@
 #include "config.h"
 #include "window.h"
 
+#include "qrc_umbrel-details.cpp"
+
+#include "QrCode.hpp"
+
 #include <QFile>
 #include <QExposeEvent>
 #include <QResizeEvent>
@@ -61,8 +65,6 @@
 #include <QSvgRenderer>
 #include <QHostAddress>
 #include <QNetworkInterface>
-
-#include "QrCode.hpp"
 
 Window::Window()
 	:QWindow()
@@ -78,20 +80,18 @@ void Window::init()
 void Window::drawBackground()
 {
     // Get logo
-    QFile file(":/umbrel.svg");
-    QFile file1(":/umbrel2.svg");
-    file.open(QIODevice::ReadOnly);
-    file1.open(QIODevice::ReadOnly);
-    QTextStream s(&file);
-    QTextStream s1(&file1);
-    QString logoString = s.readAll();
-    QString logoString1 = s1.readAll();
+    QFile logoFile(":/umbrel.svg");
+    QFile QRLogoFile(":/umbrel-qr-icon.svg");
+    logoFile.open(QIODevice::ReadOnly);
+    QRLogoFile.open(QIODevice::ReadOnly);
+    QString logoString = QTextStream(&logoFile).readAll();
+    QString qrLogoString = QTextStream(&QRLogoFile).readAll();
 
     // Get tor host name
-    QFile file2("/home/umbrel/umbrel/tor/data/web/hostname");
-    file2.open(QIODevice::ReadOnly);
-    QTextStream s2(&file2);
-    QString torAddress = "http://" + s2.readAll();
+    QFile torHostNamelogoFile("/home/umbrel/umbrel/tor/data/web/hostname");
+    torHostNamelogoFile.open(QIODevice::ReadOnly);
+    QTextStream hostNameTextStream(&torHostNamelogoFile);
+    QString torHostName = "http://" + hostNameTextStream.readAll();
 
     // Get IP
     QString ipAddress;
@@ -106,59 +106,59 @@ void Window::drawBackground()
     QPaintDevice *device = m_backingStore->paintDevice();
     QImage backgroundColorImage = QImage(this->geometry().size(), QImage::Format_RGB32);
     QImage backgroundImage(500, 500, QImage::Format_ARGB32);
-    QImage logoImage(136, 153, QImage::Format_ARGB32);
-    QImage logoImage1(68, 76.5, QImage::Format_ARGB32);
+    QImage qrCenterImage(136, 136, QImage::Format_ARGB32);
+    QImage logoImage(68, 76.5, QImage::Format_ARGB32);
     backgroundColorImage.fill(QColor(BACKGKROUND_COLOR));
     backgroundImage.fill(Qt::white);
-    logoImage.fill(Qt::white);
-    logoImage1.fill(QColor(BACKGKROUND_COLOR));
+    qrCenterImage.fill(Qt::white);
+    logoImage.fill(QColor(BACKGKROUND_COLOR));
     QPainter painter(&backgroundImage);
-    QPainter painter2(&logoImage);
-    QSvgRenderer *renderer = getQrCode(&torAddress);
+    QPainter QRLogoPainter(&qrCenterImage);
+    QSvgRenderer *renderer = getQrCode(&torHostName);
     renderer->render(&painter);
     int deltaX = this->geometry().width() - backgroundImage.width();
     int deltaY = this->geometry().height() - backgroundImage.height() + 260;
     int deltaX2 = backgroundImage.width() - 136;
-    int deltaY2 = backgroundImage.height() - 153;
-    QXmlStreamReader *reader = new QXmlStreamReader(logoString1);
+    int deltaY2 = backgroundImage.height() - 136;
+    QXmlStreamReader *reader = new QXmlStreamReader(qrLogoString);
     QSvgRenderer *renderer1 = new QSvgRenderer(reader);
-    renderer1->render(&painter2);
+    renderer1->render(&QRLogoPainter);
 
     // Draw background with QR code
-    QPainter painter3(device);
-    painter3.drawImage(this->geometry(), backgroundColorImage);
-    painter3.translate(deltaX / 2, deltaY / 2);
-    painter3.drawImage(backgroundImage.rect(), backgroundImage);
-    painter3.translate(deltaX2 / 2, deltaY2 / 2);
-    painter3.drawImage(logoImage.rect(), logoImage);
-    painter3.translate(-(deltaX / 2), -(deltaY / 2));
-    painter3.translate(-(deltaX2 / 2), -(deltaY2 / 2));
-    painter3.setPen(QPen(QColor(TEXT_COLOR)));
-    painter3.setFont(QFont(DEFAULT_FONT, 50, QFont::Bold));
-    painter3.translate(0, 20 + deltaY / 2 - 300);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter, "Welcome!");
-    painter3.translate(0, 90);
-    painter3.setFont(QFont(DEFAULT_FONT, 20, QFont::Bold));
-    painter3.drawText(this->geometry(), Qt::AlignHCenter, "Your Umbrel is up and running at:");
-    painter3.translate(0, 40);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter, "http://umbrel.local");
-    painter3.translate(0, 40);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter, "http://" + ipAddress);
-    painter3.translate(0, 40);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter, torAddress);
-    painter3.translate(0, 600);
-    painter3.drawText(this->geometry(), Qt::AlignHCenter, "Thank you for using Umbrel!");
+    QPainter textPainter(device);
+    textPainter.drawImage(this->geometry(), backgroundColorImage);
+    textPainter.translate(deltaX / 2, deltaY / 2);
+    textPainter.drawImage(backgroundImage.rect(), backgroundImage);
+    textPainter.translate(deltaX2 / 2, deltaY2 / 2);
+    textPainter.drawImage(qrCenterImage.rect(), qrCenterImage);
+    textPainter.translate(-(deltaX / 2), -(deltaY / 2));
+    textPainter.translate(-(deltaX2 / 2), -(deltaY2 / 2));
+    textPainter.setPen(QPen(QColor(TEXT_COLOR)));
+    textPainter.setFont(QFont(DEFAULT_FONT, 50, QFont::Bold));
+    textPainter.translate(0, 20 + deltaY / 2 - 300);
+    textPainter.drawText(this->geometry(), Qt::AlignHCenter, "Welcome!");
+    textPainter.translate(0, 90);
+    textPainter.setFont(QFont(DEFAULT_FONT, 20, QFont::Bold));
+    textPainter.drawText(this->geometry(), Qt::AlignHCenter, "Your Umbrel is up and running at:");
+    textPainter.translate(0, 40);
+    textPainter.drawText(this->geometry(), Qt::AlignHCenter, "http://umbrel.local");
+    textPainter.translate(0, 40);
+    textPainter.drawText(this->geometry(), Qt::AlignHCenter, "http://" + ipAddress);
+    textPainter.translate(0, 40);
+    textPainter.drawText(this->geometry(), Qt::AlignHCenter, torHostName);
+    textPainter.translate(0, 600);
+    textPainter.drawText(this->geometry(), Qt::AlignHCenter, "Thank you for using Umbrel!");
 
     // Draw Umbrel logo in the bottom left corner
-    QPainter painter4(&logoImage1);
+    QPainter logoPainter(&logoImage);
     QXmlStreamReader *reader1 = new QXmlStreamReader(logoString);
     QSvgRenderer *renderer2 = new QSvgRenderer(reader1);
-    renderer2->render(&painter4);
-    int deltaX3 = this->geometry().width() - logoImage1.width() - 15;
-    int deltaY3 = this->geometry().height() - logoImage1.height() - 15;
-    painter3.translate(deltaX3, -(20 + deltaY / 2 - 300) - 600 - 40 * 3 - 90 + deltaY3);
-    painter3.drawImage(logoImage1.rect(), logoImage1);
-    painter3.end();
+    renderer2->render(&logoPainter);
+    int deltaX3 = this->geometry().width() - logoImage.width() - 15;
+    int deltaY3 = this->geometry().height() - logoImage.height() - 15;
+    textPainter.translate(deltaX3, -(20 + deltaY / 2 - 300) - 600 - 40 * 3 - 90 + deltaY3);
+    textPainter.drawImage(logoImage.rect(), logoImage);
+    textPainter.end();
 }
 
 void Window::update()
