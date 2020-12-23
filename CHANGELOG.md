@@ -2,6 +2,12 @@
 
 ## Beta versions
 
+### Upcoming release
+
+- Remove restriction for eglfs
+- Code improvements
+- Add "Show Dashboard" button
+
 ### v0.3.0
 
 - Update icon in the center of the QR code

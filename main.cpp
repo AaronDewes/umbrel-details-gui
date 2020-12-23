@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include <QApplication>
+#include <QWindow>
 
 #include "window.h"
 #include "MainWidget.h"
@@ -58,12 +59,8 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication app(argc, argv);
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-    if(app.platformName() != "eglfs") {
-        qInfo("This application currently only works on eglfs.");
-        qInfo("Try running it with '-platform eglfs'.");
-        return 1;
-    }
     Window window;
+    window.setWindowState(Qt::WindowFullScreen);
     window.show();
     window.init();
 
