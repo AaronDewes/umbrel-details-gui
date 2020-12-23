@@ -1,5 +1,5 @@
 project(umbrel-details)
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.13)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_BUILD_TYPE Release)
