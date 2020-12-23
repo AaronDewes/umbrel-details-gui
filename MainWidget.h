@@ -48,33 +48,34 @@
 **
 ****************************************************************************/
 
-#ifndef WINDOW_H
-#define WINDOW_H
+#ifndef MAINWIDGET_H
+#define MAINWIDGET_H
 
-#include <QWidget>
+#include <QOpenGLWidget>
 
 QT_BEGIN_NAMESPACE
 
 class View;
 class QSvgRenderer;
-class QExposeEvent;
+class exposeEvent;
 
-class Window : public QWidget
+class MainWidget : public QOpenGLWidget
 {
-public:
-    Window();
+	Q_OBJECT
 
-    void init();
+public:
+    MainWidget();
+
     QSvgRenderer *getQrCode(QString *address);
+    void paintGL() override;
     
 public slots:
     void update();
-    void handleButton();
 
-private:
-    void drawBackground();
+protected:
+    bool event(QEvent *event) override;
 };
 
 QT_END_NAMESPACE
 
-#endif // WINDOW_H
+#endif // MAINWIDGET_H

@@ -49,7 +49,6 @@
 ****************************************************************************/
 
 #include "config.h"
-#include "window.h"
 #include "MainWidget.h"
 
 #include "QrCode.hpp"
@@ -57,22 +56,19 @@
 #include <QFile>
 #include <QExposeEvent>
 #include <QResizeEvent>
-#include <QWindow>
+#include <QOpenGLWidget>
 #include <QPainter>
 #include <QXmlStreamReader>
 #include <QSvgRenderer>
 #include <QHostAddress>
 #include <QNetworkInterface>
-#include <QWebEngineView>
-#include <QVBoxLayout>
-#include <QPushButton>
 
-Window::Window()
-	:QWidget()
+MainWidget::MainWidget()
+	:QOpenGLWidget()
 {
 }
 
-void Window::drawBackground()
+void MainWidget::paintGL()
 {
     // Get logo
     QFile logoFile(":/umbrel.svg");
@@ -106,7 +102,7 @@ void Window::drawBackground()
     backgroundImage.fill(Qt::white);
     qrCenterImage.fill(Qt::white);
     logoImage.fill(QColor(BACKGKROUND_COLOR));
-    QPainter painter(this);
+    QPainter painter(&backgroundImage);
     QPainter QRLogoPainter(&qrCenterImage);
     QSvgRenderer *renderer = getQrCode(&torHostName);
     renderer->render(&painter);
@@ -155,38 +151,24 @@ void Window::drawBackground()
     textPainter.end();
 }
 
-void Window::update()
+void MainWidget::update()
 {
-    drawBackground();
+    paintGL();
 }
-QSvgRenderer *Window::getQrCode(QString *address) {
+
+bool MainWidget::event(QEvent *event)
+{
+    if (event->type() == QEvent::UpdateRequest) {
+        update();
+        return true;
+    }
+    return QOpenGLWidget::event(event);
+}
+
+QSvgRenderer *MainWidget::getQrCode(QString *address) {
     qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText(address->toStdString().c_str(), qrcodegen::QrCode::Ecc::HIGH);
     QString svg = QString::fromStdString(qr0.toSvgString(4));
     QXmlStreamReader *reader = new QXmlStreamReader(svg);
     QSvgRenderer *renderer = new QSvgRenderer(reader);
     return renderer;
-}
-
-
-void Window::handleButton() {
-    layout()->removeItem(layout()->itemAt(0));
-    layout()->removeItem(layout()->itemAt(0));
-    layout()->removeItem(layout()->itemAt(0));
-    QWebEngineView *view = new QWebEngineView(this);
-    view->setUrl(QUrl("http://localhost"));
-    view->show();
-    layout()->addWidget(view);
-}
-
-void Window::init() {
-    QVBoxLayout *layout = new QVBoxLayout;
-    MainWidget *mainWidget = new MainWidget();
-    layout->setSpacing(0);
-    layout->setMargin(0);
-    QPushButton *button = new QPushButton("Open the Umbrel dashboard");
-    button->setMinimumHeight(75);
-    layout->addWidget(mainWidget);
-    layout->addWidget(button);
-    setLayout(layout);
-    connect(button, &QPushButton::clicked, this, &Window::handleButton);
 }
