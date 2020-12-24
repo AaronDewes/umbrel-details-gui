@@ -68,12 +68,6 @@ public:
 
     QSvgRenderer *getQrCode(QString *address);
     void paintGL() override;
-    
-public slots:
-    void update();
-
-protected:
-    bool event(QEvent *event) override;
 };
 
 QT_END_NAMESPACE

@@ -151,20 +151,6 @@ void MainWidget::paintGL()
     textPainter.end();
 }
 
-void MainWidget::update()
-{
-    paintGL();
-}
-
-bool MainWidget::event(QEvent *event)
-{
-    if (event->type() == QEvent::UpdateRequest) {
-        update();
-        return true;
-    }
-    return QOpenGLWidget::event(event);
-}
-
 QSvgRenderer *MainWidget::getQrCode(QString *address) {
     qrcodegen::QrCode qr0 = qrcodegen::QrCode::encodeText(address->toStdString().c_str(), qrcodegen::QrCode::Ecc::HIGH);
     QString svg = QString::fromStdString(qr0.toSvgString(4));

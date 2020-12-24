@@ -2,7 +2,7 @@
 
 ## Beta versions
 
-### Upcoming release
+### v0.99
 
 - Remove restriction for eglfs
 - Code improvements

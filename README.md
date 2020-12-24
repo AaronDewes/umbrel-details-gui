@@ -4,10 +4,10 @@
 
 A gui version of umbrel-details. Only works on Raspberry Pis with Umbrel OS installed.
 
-## Required packages to run this:
+## Required packages to build this:
 
 ```
-sudo apt install libqt5gui5 libqt5svg5 libqt5network5 -y
+sudo apt install libqt5gui5-dev libqt5svg5-dev libqt5network5-dev cmake make gcc g++ qtwebengine5-dev -y
 ```
 
 ## Build
@@ -23,8 +23,7 @@ make -j$(nproc)
 
 To run this on an Raspberry Pi with Umbrel OS, run
 ```
-export QT_QPA_EGLFS_HIDECURSOR=1
-./umbrel-details -platform eglfs
+./umbrel-details
 ```
 
 ## License

@@ -55,24 +55,16 @@
 
 QT_BEGIN_NAMESPACE
 
-class View;
-class QSvgRenderer;
-class QExposeEvent;
-
 class Window : public QWidget
 {
 public:
     Window();
 
     void init();
-    QSvgRenderer *getQrCode(QString *address);
+    void reinit();
     
 public slots:
-    void update();
     void handleButton();
-
-private:
-    void drawBackground();
 };
 
 QT_END_NAMESPACE
