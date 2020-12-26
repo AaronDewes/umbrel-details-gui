@@ -1,3 +1,5 @@
+This is now maintained at https://github.com/UmbrelOS-Tweaks/umbrel-gui.
+
 # GUI for Umbrel details
 
 ![Example](example.png)
